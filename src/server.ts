@@ -6,7 +6,9 @@ const app = Fastify({
   logger: true,
 });
 
-app.register(transactionsRoutes);
+app.register(transactionsRoutes, {
+  prefix: "/transactions",
+});
 
 app
   .listen({
