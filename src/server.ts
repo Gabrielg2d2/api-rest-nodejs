@@ -6,9 +6,19 @@ const app = Fastify({
 });
 
 app.get("/hello", async function handler(request, response) {
-  const tables = await knex("sqlite_schema").select("*");
+  // const newTransaction = await knex("transactions")
+  //   .insert({
+  //     id: crypto.randomUUID(),
+  //     title: "Transação Teste",
+  //     amount: 400,
+  //   })
+  //   .returning("*");
 
-  return tables;
+  // return newTransaction;
+
+  const transactions = await knex("transactions").select("*");
+
+  return transactions;
 });
 
 app
