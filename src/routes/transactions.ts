@@ -43,7 +43,9 @@ export async function transactionsRoutes(app: FastifyInstance) {
 
       if (!verifyBody.success) {
         return response.status(400).send({
-          data: null,
+          data: {
+            transaction: null,
+          },
           message: {
             en: "Invalid data",
             pt: "Dados inválidos",
@@ -63,9 +65,11 @@ export async function transactionsRoutes(app: FastifyInstance) {
 
       return response.status(201).send({
         data: {
-          title: body.title,
-          amount: body.amount,
-          type: body.type,
+          transaction: {
+            title: body.title,
+            amount: body.amount,
+            type: body.type,
+          },
         },
         message: {
           en: "Transaction created successfully",
@@ -75,7 +79,9 @@ export async function transactionsRoutes(app: FastifyInstance) {
       });
     } catch (error) {
       return response.status(500).send({
-        data: null,
+        data: {
+          transaction: null,
+        },
         message: {
           en: "Internal server error",
           pt: "Erro interno do servidor",
