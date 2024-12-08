@@ -5,6 +5,32 @@ import { knex } from "../database";
 import { ITypeMessageGlobal } from "../global/types/typeMessage";
 
 export async function transactionsRoutes(app: FastifyInstance) {
+  app.get("/", async () => {
+    try {
+      const transactions = await knex("transactions").select("*");
+
+      return {
+        data: {
+          transactions,
+        },
+        message: {
+          en: "",
+          pt: "",
+        },
+        typeMessage: ITypeMessageGlobal.SUCCESS,
+      };
+    } catch (error) {
+      return {
+        data: { transactions: [] },
+        message: {
+          en: "Internal server error",
+          pt: "Erro interno do servidor",
+        },
+        typeMessage: ITypeMessageGlobal.FATAL,
+      };
+    }
+  });
+
   app.post("/", async (request, response) => {
     try {
       const createTransactionSchema = z.object({
