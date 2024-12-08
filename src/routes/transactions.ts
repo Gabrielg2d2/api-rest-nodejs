@@ -79,6 +79,56 @@ export async function transactionsRoutes(app: FastifyInstance) {
     }
   });
 
+  app.get("/summary", async () => {
+    try {
+      const transactions = await knex("transactions").select("*");
+
+      const summary = transactions.reduce(
+        (acc, transaction) => {
+          if (transaction.amount > 0) {
+            acc.deposit += transaction.amount;
+          } else {
+            acc.withdraw += transaction.amount;
+          }
+
+          acc.total += transaction.amount;
+          return acc;
+        },
+        {
+          deposit: 0,
+          withdraw: 0,
+          total: 0,
+        }
+      );
+
+      return {
+        data: {
+          summary,
+        },
+        message: {
+          en: "",
+          pt: "",
+        },
+        typeMessage: ITypeMessageGlobal.SUCCESS,
+      };
+    } catch (error) {
+      return {
+        data: {
+          summary: {
+            deposit: 0,
+            withdraw: 0,
+            total: 0,
+          },
+        },
+        message: {
+          en: "Internal server error",
+          pt: "Erro interno do servidor",
+        },
+        typeMessage: ITypeMessageGlobal.FATAL,
+      };
+    }
+  });
+
   app.post("/", async (request, response) => {
     try {
       const createTransactionSchema = z.object({
