@@ -54,7 +54,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
           en: "Internal server error",
           pt: "Erro interno do servidor",
         },
-        typeMessage: ITypeMessageGlobal.ERROR,
+        typeMessage: ITypeMessageGlobal.FATAL,
       });
     }
   });
