@@ -31,6 +31,54 @@ export async function transactionsRoutes(app: FastifyInstance) {
     }
   });
 
+  app.get("/:id", async (request) => {
+    try {
+      const getTransactionSchema = z.object({
+        id: z.string().uuid(),
+      });
+
+      const verifyParams = getTransactionSchema.safeParse(request.params);
+
+      if (!verifyParams.success) {
+        return {
+          data: {
+            transaction: null,
+          },
+          message: {
+            en: "Invalid data",
+            pt: "Dados inválidos",
+          },
+          typeMessage: ITypeMessageGlobal.ERROR,
+          errors: verifyParams.error.errors,
+        };
+      }
+
+      const { id } = verifyParams.data;
+
+      const transaction = await knex("transactions").where({ id }).first();
+
+      return {
+        data: {
+          transaction,
+        },
+        message: {
+          en: "",
+          pt: "",
+        },
+        typeMessage: ITypeMessageGlobal.SUCCESS,
+      };
+    } catch (error) {
+      return {
+        data: { transaction: [] },
+        message: {
+          en: "Internal server error",
+          pt: "Erro interno do servidor",
+        },
+        typeMessage: ITypeMessageGlobal.FATAL,
+      };
+    }
+  });
+
   app.post("/", async (request, response) => {
     try {
       const createTransactionSchema = z.object({
