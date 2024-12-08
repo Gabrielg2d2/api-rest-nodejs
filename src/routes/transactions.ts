@@ -5,7 +5,7 @@ import { knex } from "../database";
 import { ITypeMessageGlobal } from "../global/types/typeMessage";
 
 export async function transactionsRoutes(app: FastifyInstance) {
-  app.post("/transactions", async (request, response) => {
+  app.post("/", async (request, response) => {
     try {
       const createTransactionSchema = z.object({
         title: z.string(),
