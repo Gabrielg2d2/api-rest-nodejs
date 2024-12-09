@@ -1,7 +1,11 @@
 {
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "knex": "node --import tsx ./node_modules/.bin/knex"
+    "knex": "node --import tsx ./node_modules/.bin/knex",
+    "create:migration": "npm run knex -- migrate:make",
+    "migrate": "npm run knex -- migrate:latest",
+    "rollback": "npm run knex -- migrate:rollback",
+    "test": "vitest"
   },
   "dependencies": {
     "@fastify/cookie": "^11.0.1",
