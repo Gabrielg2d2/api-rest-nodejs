@@ -135,5 +135,35 @@ describe("Routes Transactions", () => {
         typeMessage: "success",
       });
     });
+
+    test("List transaction specific with invalid id", async () => {
+      const createTransactionResponse = await request(app.server)
+        .post("/transactions")
+        .send({
+          title: "car",
+          amount: 3000,
+          type: "credit",
+        });
+
+      const cookies = createTransactionResponse.get("Set-Cookie");
+
+      if (!cookies) {
+        throw new Error("No cookies set in response");
+      }
+
+      const response = await request(app.server);
+      const transactionId = "invalid";
+
+      const responseListTransactions = await response
+        .get("/transactions")
+        .set("Cookie", cookies);
+
+      const responseGetTransaction = await response
+
+        .get(`/transactions/${transactionId}`)
+        .set("Cookie", cookies);
+
+      expect(responseGetTransaction.statusCode).toBe(400);
+    });
   });
 });
