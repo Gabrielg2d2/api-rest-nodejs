@@ -19,7 +19,12 @@ function errorInternalServer(reply: FastifyReply) {
 export async function transactionsRoutes(app: FastifyInstance) {
   // LOGS
   app.addHook("onRequest", (request, reply, done) => {
-    console.log(`${request.method} ${request.url} - ${new Date()}`);
+    const sessionId = request.cookies.sessionId;
+    console.log(
+      `${request.method} ${
+        request.url
+      } - ${new Date()} - SessionId: ${sessionId}`
+    );
     done();
   });
 
