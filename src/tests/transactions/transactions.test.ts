@@ -93,5 +93,47 @@ describe("Routes Transactions", () => {
         typeMessage: "success",
       });
     });
+
+    test("List transaction specific", async () => {
+      const createTransactionResponse = await request(app.server)
+        .post("/transactions")
+        .send({
+          title: "car",
+          amount: 3000,
+          type: "credit",
+        });
+
+      const cookies = createTransactionResponse.get("Set-Cookie");
+
+      if (!cookies) {
+        throw new Error("No cookies set in response");
+      }
+
+      const responseListTransactions = await request(app.server)
+        .get("/transactions")
+        .set("Cookie", cookies);
+
+      const transactionId =
+        responseListTransactions.body.data.transactions[0].id;
+
+      const response = await request(app.server)
+        .get(`/transactions/${transactionId}`)
+        .set("Cookie", cookies);
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toEqual({
+        data: {
+          transaction: {
+            created_at: expect.any(String),
+            id: expect.any(String),
+            session_id: expect.any(String),
+            amount: 3000,
+            title: "car",
+          },
+        },
+        message: { en: "", pt: "" },
+        typeMessage: "success",
+      });
+    });
   });
 });
