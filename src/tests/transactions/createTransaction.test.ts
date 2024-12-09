@@ -71,6 +71,21 @@ describe("Routes Transactions", () => {
         message: { en: "", pt: "" },
         typeMessage: "success",
       });
+      expect(response.body).toEqual({
+        data: {
+          transactions: [
+            {
+              created_at: expect.any(String),
+              id: expect.any(String),
+              session_id: expect.any(String),
+              amount: 3000,
+              title: "car",
+            },
+          ],
+        },
+        message: { en: "", pt: "" },
+        typeMessage: "success",
+      });
     });
   });
 });
