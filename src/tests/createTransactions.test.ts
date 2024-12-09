@@ -1,9 +1,13 @@
 import request from "supertest";
-import { beforeAll, expect, test } from "vitest";
+import { afterAll, beforeAll, expect, test } from "vitest";
 import { app } from "../app";
 
 beforeAll(async () => {
   await app.ready();
+});
+
+afterAll(async () => {
+  await app.close();
 });
 
 test("Criar transações", async () => {
