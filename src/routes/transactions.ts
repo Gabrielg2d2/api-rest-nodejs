@@ -7,6 +7,21 @@ import { ITypeMessageGlobal } from "../global/types/typeMessage";
 export async function transactionsRoutes(app: FastifyInstance) {
   app.get("/", async (request, reply) => {
     try {
+      const sessionId = request.cookies.sessionId;
+
+      if (!sessionId) {
+        return reply.status(401).send({
+          data: {
+            transactions: [],
+          },
+          message: {
+            en: "Unauthorized",
+            pt: "Não autorizado",
+          },
+          typeMessage: ITypeMessageGlobal.ERROR,
+        });
+      }
+
       const transactions = await knex("transactions").select("*");
 
       return {
@@ -31,7 +46,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
     }
   });
 
-  app.get("/:id", async (request) => {
+  app.get("/:id", async (request, reply) => {
     try {
       const getTransactionSchema = z.object({
         id: z.string().uuid(),
@@ -40,7 +55,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
       const verifyParams = getTransactionSchema.safeParse(request.params);
 
       if (!verifyParams.success) {
-        return {
+        return reply.status(400).send({
           data: {
             transaction: null,
           },
@@ -50,14 +65,14 @@ export async function transactionsRoutes(app: FastifyInstance) {
           },
           typeMessage: ITypeMessageGlobal.ERROR,
           errors: verifyParams.error.errors,
-        };
+        });
       }
 
       const { id } = verifyParams.data;
 
       const transaction = await knex("transactions").where({ id }).first();
 
-      return {
+      return reply.status(200).send({
         data: {
           transaction,
         },
@@ -66,7 +81,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
           pt: "",
         },
         typeMessage: ITypeMessageGlobal.SUCCESS,
-      };
+      });
     } catch (error) {
       return {
         data: { transaction: [] },
