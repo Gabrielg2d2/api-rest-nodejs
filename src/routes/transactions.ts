@@ -17,6 +17,12 @@ function errorInternalServer(reply: FastifyReply) {
 }
 
 export async function transactionsRoutes(app: FastifyInstance) {
+  // LOGS
+  app.addHook("onRequest", (request, reply, done) => {
+    console.log(`${request.method} ${request.url} - ${new Date()}`);
+    done();
+  });
+
   app.get(
     "/",
     {
