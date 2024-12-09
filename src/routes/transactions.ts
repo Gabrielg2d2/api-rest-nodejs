@@ -17,7 +17,7 @@ function errorInternalServer(reply: FastifyReply) {
 }
 
 export async function transactionsRoutes(app: FastifyInstance) {
-  // LOGS
+  // LOGS TRANSACTION
   app.addHook("onRequest", (request, reply, done) => {
     const sessionId = request.cookies.sessionId;
     console.log(
