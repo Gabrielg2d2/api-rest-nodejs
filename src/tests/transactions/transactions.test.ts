@@ -165,5 +165,47 @@ describe("Routes Transactions", () => {
 
       expect(responseGetTransaction.statusCode).toBe(400);
     });
+
+    test("Summary of transactions", async () => {
+      const createTransactionResponse = await request(app.server)
+        .post("/transactions")
+        .send({
+          title: "car",
+          amount: 3000,
+          type: "credit",
+        });
+
+      const cookies = createTransactionResponse.get("Set-Cookie");
+
+      if (!cookies) {
+        throw new Error("No cookies set in response");
+      }
+
+      await request(app.server)
+        .post("/transactions")
+        .send({
+          title: "car",
+          amount: 500,
+          type: "debit",
+        })
+        .set("Cookie", cookies);
+
+      const response = await request(app.server)
+        .get("/transactions/summary")
+        .set("Cookie", cookies);
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toEqual({
+        data: {
+          summary: {
+            deposit: 3000,
+            total: 2500,
+            withdraw: -500,
+          },
+        },
+        message: { en: "", pt: "" },
+        typeMessage: "success",
+      });
+    });
   });
 });
