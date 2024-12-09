@@ -3,9 +3,7 @@ import Fastify from "fastify";
 import { env } from "./env";
 import { transactionsRoutes } from "./routes/transactions";
 
-const app = Fastify({
-  logger: true,
-});
+const app = Fastify();
 
 app.register(cookie);
 
