@@ -12,7 +12,7 @@ afterAll(async () => {
 });
 
 describe("Transactions", () => {
-  test("Create", async () => {
+  test("Create transaction", async () => {
     const response = await request(app.server).post("/transactions").send({
       title: "car",
       amount: 3000,
