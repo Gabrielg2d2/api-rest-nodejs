@@ -94,7 +94,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
     }
   });
 
-  app.get("/summary", async () => {
+  app.get("/summary", async (_, reply) => {
     try {
       const transactions = await knex("transactions").select("*");
 
@@ -116,7 +116,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
         }
       );
 
-      return {
+      return reply.status(200).send({
         data: {
           summary,
         },
@@ -125,7 +125,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
           pt: "",
         },
         typeMessage: ITypeMessageGlobal.SUCCESS,
-      };
+      });
     } catch (error) {
       return {
         data: {
