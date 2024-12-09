@@ -26,17 +26,6 @@ export async function transactionsRoutes(app: FastifyInstance) {
       try {
         const sessionId = request.cookies.sessionId;
 
-        if (!sessionId) {
-          return reply.status(401).send({
-            data: null,
-            message: {
-              en: "Unauthorized",
-              pt: "Não autorizado",
-            },
-            typeMessage: ITypeMessageGlobal.ERROR,
-          });
-        }
-
         const transactions = await knex("transactions")
           .where("session_id", sessionId)
           .select("*");
