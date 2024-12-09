@@ -36,7 +36,9 @@ export async function transactionsRoutes(app: FastifyInstance) {
         });
       }
 
-      const transactions = await knex("transactions").select("*");
+      const transactions = await knex("transactions")
+        .where("session_id", sessionId)
+        .select("*");
 
       return {
         data: {
