@@ -5,7 +5,7 @@ import { knex } from "../database";
 import { ITypeMessageGlobal } from "../global/types/typeMessage";
 
 export async function transactionsRoutes(app: FastifyInstance) {
-  app.get("/", async () => {
+  app.get("/", async (request, reply) => {
     try {
       const transactions = await knex("transactions").select("*");
 
@@ -129,7 +129,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
     }
   });
 
-  app.post("/", async (request, response) => {
+  app.post("/", async (request, reply) => {
     try {
       const createTransactionSchema = z.object({
         title: z.string(),
@@ -140,7 +140,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
       const verifyBody = createTransactionSchema.safeParse(request.body);
 
       if (!verifyBody.success) {
-        return response.status(400).send({
+        return reply.status(400).send({
           data: {
             transaction: null,
           },
@@ -160,7 +160,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
       if (!sessionId) {
         sessionId = randomUUID();
 
-        response.setCookie("sessionId", sessionId, {
+        reply.setCookie("sessionId", sessionId, {
           path: "/",
           maxAge: 60 * 60 * 24 * 7, // 7 days
         });
@@ -173,7 +173,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
         session_id: sessionId,
       });
 
-      return response.status(201).send({
+      return reply.status(201).send({
         data: {
           transaction: {
             title: body.title,
@@ -188,7 +188,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
         typeMessage: ITypeMessageGlobal.SUCCESS,
       });
     } catch (error) {
-      return response.status(500).send({
+      return reply.status(500).send({
         data: {
           transaction: null,
         },
