@@ -164,70 +164,64 @@ export async function transactionsRoutes(app: FastifyInstance) {
     }
   );
 
-  app.post(
-    "/",
-    {
-      preHandler: [checkSessionIdExists],
-    },
-    async (request, reply) => {
-      try {
-        const createTransactionSchema = z.object({
-          title: z.string(),
-          amount: z.number(),
-          type: z.enum(["credit", "debit"]),
-        });
+  app.post("/", async (request, reply) => {
+    try {
+      const createTransactionSchema = z.object({
+        title: z.string(),
+        amount: z.number(),
+        type: z.enum(["credit", "debit"]),
+      });
 
-        const verifyBody = createTransactionSchema.safeParse(request.body);
+      const verifyBody = createTransactionSchema.safeParse(request.body);
 
-        if (!verifyBody.success) {
-          return reply.status(400).send({
-            data: null,
-            message: {
-              en: "Invalid data",
-              pt: "Dados inválidos",
-            },
-            typeMessage: ITypeMessageGlobal.ERROR,
-            errors: verifyBody.error.errors,
-          });
-        }
-
-        const body = verifyBody.data;
-
-        let sessionId = request.cookies.sessionId;
-
-        if (!sessionId) {
-          sessionId = randomUUID();
-
-          reply.setCookie("sessionId", sessionId, {
-            path: "/",
-            maxAge: 60 * 60 * 24 * 7, // 7 days
-          });
-        }
-
-        await knex("transactions").insert({
-          id: randomUUID(),
-          title: body.title,
-          amount: body.type === "credit" ? body.amount : -body.amount,
-          session_id: sessionId,
-        });
-
-        return reply.status(201).send({
-          data: {
-            transaction: {
-              title: body.title,
-              amount: body.amount,
-              type: body.type,
-            },
-          },
+      if (!verifyBody.success) {
+        return reply.status(400).send({
+          data: null,
           message: {
-            en: "Transaction created successfully",
-            pt: "Transação criada com sucesso",
+            en: "Invalid data",
+            pt: "Dados inválidos",
           },
-          typeMessage: ITypeMessageGlobal.SUCCESS,
+          typeMessage: ITypeMessageGlobal.ERROR,
+          errors: verifyBody.error.errors,
         });
-      } catch (error) {
-        return errorInternalServer(reply);
       }
+
+      const body = verifyBody.data;
+
+      let sessionId = request.cookies.sessionId;
+
+      if (!sessionId) {
+        sessionId = randomUUID();
+
+        reply.setCookie("sessionId", sessionId, {
+          path: "/",
+          maxAge: 60 * 60 * 24 * 7, // 7 days
+        });
+      }
+
+      await knex("transactions").insert({
+        id: randomUUID(),
+        title: body.title,
+        amount: body.type === "credit" ? body.amount : -body.amount,
+        session_id: sessionId,
+      });
+
+      return reply.status(201).send({
+        data: {
+          transaction: {
+            title: body.title,
+            amount: body.amount,
+            type: body.type,
+          },
+        },
+        message: {
+          en: "Transaction created successfully",
+          pt: "Transação criada com sucesso",
+        },
+        typeMessage: ITypeMessageGlobal.SUCCESS,
+      });
+    } catch (error) {
+      return errorInternalServer(reply);
     }
-  );
+  });
 }
