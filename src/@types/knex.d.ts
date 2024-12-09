@@ -1,5 +1,5 @@
-import { RandomUUIDOptions } from "crypto";
-import { Knex } from "knex";
+import type { Knex } from "knex";
+import type { RandomUUIDOptions } from "node:crypto";
 
 type knexConfig = Knex.Config;
 type IRandomUUID = MaybeRawColumn<RandomUUIDOptions> | undefined;
