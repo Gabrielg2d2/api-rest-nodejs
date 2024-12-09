@@ -4,12 +4,9 @@ import { z } from "zod";
 import { knex } from "../database";
 import { ITypeMessageGlobal } from "../global/types/typeMessage";
 
-function errorInternalServer<DATA_ERROR>(
-  reply: FastifyReply,
-  dataError: DATA_ERROR
-) {
+function errorInternalServer(reply: FastifyReply) {
   return reply.status(500).send({
-    data: dataError,
+    data: null,
     message: {
       en: "Internal server error",
       pt: "Erro interno do servidor",
@@ -25,9 +22,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
 
       if (!sessionId) {
         return reply.status(401).send({
-          data: {
-            transactions: [],
-          },
+          data: null,
           message: {
             en: "Unauthorized",
             pt: "Não autorizado",
@@ -51,7 +46,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
         typeMessage: ITypeMessageGlobal.SUCCESS,
       };
     } catch (error) {
-      return errorInternalServer(reply, { transactions: [] });
+      return errorInternalServer(reply);
     }
   });
 
@@ -65,9 +60,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
 
       if (!verifyParams.success) {
         return reply.status(400).send({
-          data: {
-            transaction: null,
-          },
+          data: null,
           message: {
             en: "Invalid data",
             pt: "Dados inválidos",
@@ -92,7 +85,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
         typeMessage: ITypeMessageGlobal.SUCCESS,
       });
     } catch (error) {
-      return errorInternalServer(reply, { transaction: [] });
+      return errorInternalServer(reply);
     }
   });
 
@@ -129,13 +122,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
         typeMessage: ITypeMessageGlobal.SUCCESS,
       });
     } catch (error) {
-      return errorInternalServer(reply, {
-        summary: {
-          deposit: 0,
-          withdraw: 0,
-          total: 0,
-        },
-      });
+      return errorInternalServer(reply);
     }
   });
 
@@ -151,9 +138,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
 
       if (!verifyBody.success) {
         return reply.status(400).send({
-          data: {
-            transaction: null,
-          },
+          data: null,
           message: {
             en: "Invalid data",
             pt: "Dados inválidos",
@@ -198,7 +183,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
         typeMessage: ITypeMessageGlobal.SUCCESS,
       });
     } catch (error) {
-      return errorInternalServer(reply, { transaction: null });
+      return errorInternalServer(reply);
     }
   });
 }
