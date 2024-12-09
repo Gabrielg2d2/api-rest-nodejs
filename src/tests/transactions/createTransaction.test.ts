@@ -1,6 +1,7 @@
+import { execSync } from "node:child_process";
 import { describe } from "node:test";
 import request from "supertest";
-import { afterAll, beforeAll, expect, test } from "vitest";
+import { afterAll, beforeAll, beforeEach, expect, test } from "vitest";
 import { app } from "../../app";
 
 beforeAll(async () => {
@@ -9,6 +10,11 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await app.close();
+});
+
+beforeEach(async () => {
+  execSync("npm run rollback --all");
+  execSync("npm run migrate");
 });
 
 describe("Routes Transactions", () => {
