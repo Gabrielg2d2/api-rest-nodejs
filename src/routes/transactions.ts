@@ -84,7 +84,22 @@ export async function transactionsRoutes(app: FastifyInstance) {
 
         const { id } = verifyParams.data;
 
-        const transaction = await knex("transactions").where({ id }).first();
+        const sessionId = request.cookies.sessionId;
+
+        const transaction = await knex("transactions")
+          .where({ id, session_id: sessionId })
+          .first();
+
+        if (!transaction) {
+          return reply.status(404).send({
+            data: null,
+            message: {
+              en: "Transaction not found",
+              pt: "Transação não encontrada",
+            },
+            typeMessage: ITypeMessageGlobal.ERROR,
+          });
+        }
 
         return reply.status(200).send({
           data: {
@@ -107,9 +122,24 @@ export async function transactionsRoutes(app: FastifyInstance) {
     {
       preHandler: [checkSessionIdExists],
     },
-    async (_, reply) => {
+    async (request, reply) => {
       try {
-        const transactions = await knex("transactions").select("*");
+        const sessionId = request.cookies.sessionId;
+
+        const transactions = await knex("transactions")
+          .where("session_id", sessionId)
+          .select("*");
+
+        if (transactions.length === 0) {
+          return reply.status(404).send({
+            data: null,
+            message: {
+              en: "No records found",
+              pt: "Nenhum registro encontrado",
+            },
+            typeMessage: ITypeMessageGlobal.ERROR,
+          });
+        }
 
         const summary = transactions.reduce(
           (acc, transaction) => {
