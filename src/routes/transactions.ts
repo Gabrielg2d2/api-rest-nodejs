@@ -1,8 +1,22 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyReply } from "fastify";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { knex } from "../database";
 import { ITypeMessageGlobal } from "../global/types/typeMessage";
+
+function errorInternalServer<DATA_ERROR>(
+  reply: FastifyReply,
+  dataError: DATA_ERROR
+) {
+  return reply.status(500).send({
+    data: dataError,
+    message: {
+      en: "Internal server error",
+      pt: "Erro interno do servidor",
+    },
+    typeMessage: ITypeMessageGlobal.FATAL,
+  });
+}
 
 export async function transactionsRoutes(app: FastifyInstance) {
   app.get("/", async (request, reply) => {
@@ -35,14 +49,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
         typeMessage: ITypeMessageGlobal.SUCCESS,
       };
     } catch (error) {
-      return {
-        data: { transactions: [] },
-        message: {
-          en: "Internal server error",
-          pt: "Erro interno do servidor",
-        },
-        typeMessage: ITypeMessageGlobal.FATAL,
-      };
+      return errorInternalServer(reply, { transactions: [] });
     }
   });
 
@@ -83,14 +90,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
         typeMessage: ITypeMessageGlobal.SUCCESS,
       });
     } catch (error) {
-      return {
-        data: { transaction: [] },
-        message: {
-          en: "Internal server error",
-          pt: "Erro interno do servidor",
-        },
-        typeMessage: ITypeMessageGlobal.FATAL,
-      };
+      return errorInternalServer(reply, { transaction: [] });
     }
   });
 
@@ -127,20 +127,13 @@ export async function transactionsRoutes(app: FastifyInstance) {
         typeMessage: ITypeMessageGlobal.SUCCESS,
       });
     } catch (error) {
-      return {
-        data: {
-          summary: {
-            deposit: 0,
-            withdraw: 0,
-            total: 0,
-          },
+      return errorInternalServer(reply, {
+        summary: {
+          deposit: 0,
+          withdraw: 0,
+          total: 0,
         },
-        message: {
-          en: "Internal server error",
-          pt: "Erro interno do servidor",
-        },
-        typeMessage: ITypeMessageGlobal.FATAL,
-      };
+      });
     }
   });
 
@@ -203,16 +196,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
         typeMessage: ITypeMessageGlobal.SUCCESS,
       });
     } catch (error) {
-      return reply.status(500).send({
-        data: {
-          transaction: null,
-        },
-        message: {
-          en: "Internal server error",
-          pt: "Erro interno do servidor",
-        },
-        typeMessage: ITypeMessageGlobal.FATAL,
-      });
+      return errorInternalServer(reply, { transaction: null });
     }
   });
 }
